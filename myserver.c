@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
     // Packet Tracker:
     bool packet_seq_started = false;
     uint8_t packet_seq_num = 0;
-    uint16_t packet_OK = 1;
+    uint16_t packet_status = 1; // 0 if OK, else REJECT sub code
 
     // Server runs forever, I guess
     while (1)
@@ -114,9 +114,9 @@ int main(int argc, char *argv[])
 #endif
 
         // ACK or REJ logic here: All 4 Server Reject Sub-Code cases are handled here
-        packet_OK = validate_client_data_packet(&packet_seq_started, &packet_seq_num, &data_packet, &prev_data_packet);
+        packet_status = validate_client_data_packet(&packet_seq_started, &packet_seq_num, &data_packet, &prev_data_packet);
 
-        if (packet_OK == PACKET_OK)
+        if (packet_status == PACKET_OK)
         {
             // Tracking the packet sequence: Since packet's valid
             if (!packet_seq_started)
@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
         {
             // REJ packet response:
             reset_reject_packet(&reject_packet);
-            update_reject_packet(&reject_packet, data_packet.client_id, packet_OK, data_packet.segment_no);
+            update_reject_packet(&reject_packet, data_packet.client_id, packet_status, data_packet.segment_no);
             // Sending ACK response back to Client
             n = sendto(sock, (const reject_packet_t *)&reject_packet_size, reject_packet_size,
                        0, (const struct sockaddr *)&client, clientlen);
