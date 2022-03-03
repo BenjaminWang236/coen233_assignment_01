@@ -48,7 +48,7 @@ bool is_valid_data_packet(data_packet_t *packet)
         printf("Error: Invalid packet type 0x%04X\n", packet->packet_type);
         return false;
     }
-    if (packet->segment_no >= PACKET_GROUP_SIZE)   // [0 - (size-1)]
+    if (packet->segment_no >= PACKET_GROUP_SIZE) // [0 - (size-1)]
     {
         printf("Error: Invalid segment number %hu\n", packet->segment_no);
         return false;
@@ -73,7 +73,7 @@ bool is_valid_ack_packet(ack_packet_t *packet)
         printf("Error: Invalid packet type 0x%04X\n", packet->packet_type);
         return false;
     }
-    if (packet->received_segment_no >= PACKET_GROUP_SIZE)   // [0 - (size-1)]
+    if (packet->received_segment_no >= PACKET_GROUP_SIZE) // [0 - (size-1)]
     {
         printf("Error: Invalid received segment number %hu\n", packet->received_segment_no);
         return false;
@@ -104,7 +104,7 @@ bool is_valid_reject_packet(reject_packet_t *packet)
         printf("Error: Invalid reject sub code 0x%04X\n", packet->sub_code);
         return false;
     }
-    if (packet->received_segment_no >= PACKET_GROUP_SIZE)   // [0 - (size-1)]
+    if (packet->received_segment_no >= PACKET_GROUP_SIZE) // [0 - (size-1)]
     {
         printf("Error: Invalid received segment number %hu\n", packet->received_segment_no);
         return false;
@@ -173,7 +173,7 @@ char *data_packet_to_string(data_packet_t *packet)
     snprintf(
         string,
         DATA_PACKET_STRING_SIZE,
-        "\nstart=\t%04X\nclient_id=\t%hu\npacket_type=\t%04X\nsegment_no=\t%02X\nlength=\t%02X\npayload=\t%s\nend=\t%04X\n",
+        "\nstart=\t0x%04X\nclient_id=\t%hu\npacket_type=\t0x%04X\nsegment_no=\t%hu\nlength=\t%hu\npayload=\t%s\nend=\t0x%04X\n",
         packet->start_packet,
         packet->client_id,
         (uint16_t)packet->packet_type,
@@ -192,7 +192,7 @@ char *ack_packet_to_string(ack_packet_t *packet)
     snprintf(
         string,
         ACK_PACKET_STRING_SIZE,
-        "\nstart=\t%04X\nclient_id=\t%hu\npacket_type=\t%04X\nreceived_segment_no=\t%hu\nend=\t%04X\n",
+        "\nstart=\t0x%04X\nclient_id=\t%hu\npacket_type=\t0x%04X\nreceived_segment_no=\t%hu\nend=\t0x%04X\n",
         packet->start_packet,
         packet->client_id,
         (uint16_t)packet->packet_type,
@@ -209,7 +209,7 @@ char *reject_packet_to_string(reject_packet_t *packet)
     snprintf(
         string,
         REJECT_PACKET_STRING_SIZE,
-        "\nstart=\t%04X\nclient_id=\t%hu\npacket_type=\t%04X\nsub_code=\t%04X\nreceived_segment_no=\t%hu\nend=\t%04X\n",
+        "\nstart=\t0x%04X\nclient_id=\t%hu\npacket_type=\t0x%04X\nsub_code=\t%04X\nreceived_segment_no=\t%hu\nend=\t0x%04X\n",
         packet->start_packet,
         packet->client_id,
         (uint16_t)packet->packet_type,

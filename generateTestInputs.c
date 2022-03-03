@@ -2,7 +2,7 @@
  * @file generateTestInputs.c
  * @author Benjamin Wang (bwang4@scu.edu, ID: 1179478)
  * @brief Client using customized protocol on top of UDP protocol for sending
- * information to the server. Generate the test cases as input files
+ * information to the server. Generate the test cases as input files, and also debugging
  * @version 0.1
  * @date 2022-03-02
  *
@@ -38,7 +38,8 @@ int main(int argc, char *argv[])
         printf("Test: data_packet is valid\n");
     else
         printf("Test: data_packet is invalid\n");
-    printf("payload: %s\n", data_packet.payload);
+    // printf("payload: %s\n", data_packet.payload);
+    printf("data_packet_to_string: %s\n", data_packet_to_string(&data_packet));
 #endif
 
     return EXIT_SUCCESS;

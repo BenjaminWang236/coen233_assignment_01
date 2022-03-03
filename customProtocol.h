@@ -123,30 +123,29 @@ void update_ack_packet(ack_packet_t *packet, uint8_t client_id, uint8_t received
 void update_reject_packet(reject_packet_t *packet, uint8_t client_id, REJECT_SUB_CODE sub_code, uint8_t received_segment_no);
 
 // ToString Sizes, gathered from compiler warnings:
-#define DATA_PACKET_STRING_SIZE 347
-#define ACK_PACKET_STRING_SIZE 82
-#define REJECT_PACKET_STRING_SIZE 97
-// NOTE: MUST BE FOLLOWED BY A FREE() CALL TO PREVENT MEMORY LEAKS
+#define DATA_PACKET_STRING_SIZE 355
+#define ACK_PACKET_STRING_SIZE 88
+#define REJECT_PACKET_STRING_SIZE 103
 /**
- * @brief Convert DATA packet to string
- * 
+ * @brief Convert DATA packet to string. NOTE: MUST BE FOLLOWED BY A FREE() CALL TO PREVENT MEMORY LEAKS
+ *
  * @param packet data_packet_t packet to convert
  * @return char* string representation of packet
  */
-char* data_packet_to_string(data_packet_t *packet);
+char *data_packet_to_string(data_packet_t *packet);
 /**
- * @brief Convert ACK packet to string
- * 
+ * @brief Convert ACK packet to string. NOTE: MUST BE FOLLOWED BY A FREE() CALL TO PREVENT MEMORY LEAKS
+ *
  * @param packet ack_packet_t packet to convert
  * @return char* string representation of packet
  */
-char* ack_packet_to_string(ack_packet_t *packet);
+char *ack_packet_to_string(ack_packet_t *packet);
 /**
- * @brief Convert REJECT packet to string
- * 
+ * @brief Convert REJECT packet to string. NOTE: MUST BE FOLLOWED BY A FREE() CALL TO PREVENT MEMORY LEAKS
+ *
  * @param packet reject_packet_t packet to convert
  * @return char* string representation of packet
  */
-char* reject_packet_to_string(reject_packet_t *packet);
+char *reject_packet_to_string(reject_packet_t *packet);
 
 #endif
