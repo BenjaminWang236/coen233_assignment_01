@@ -12,30 +12,7 @@
  *
  */
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-
-#define PORT 8080
-#define MAXLINE 1024    // Not used
-#define LINE_LENGTH 256
-
-/**
- * @brief Error function
- *
- * @param msg Error message
- */
-void error(const char *msg)
-{
-    perror(msg);
-    exit(EXIT_FAILURE);
-}
+#include "customProtocol.h"
 
 /**
  * @brief Main function (Driver code)
@@ -66,14 +43,13 @@ int main(int argc, char *argv[])
 
     // Reading input file:
 
-
     // Create socket:
     if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
         error("Error: socket");
 
     // Filling server information
     server.sin_family = AF_INET;
-    if ((hp = gethostbyname((const char*)host)) == 0)
+    if ((hp = gethostbyname((const char *)host)) == 0)
         error("Error: Unknown host");
     bcopy((char *)hp->h_addr,
           (char *)&server.sin_addr,

@@ -12,30 +12,7 @@
  *
  */
 
-#include <stdio.h>
-#include <sys/types.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <string.h>
-#include <netdb.h>
-#include <stdio.h>
-#include <arpa/inet.h>
-
-#define PORT 8080
-#define MAXLINE 1024
-
-/**
- * @brief Error function
- *
- * @param msg Error message
- */
-void error(const char *msg)
-{
-    perror(msg);
-    exit(EXIT_FAILURE);
-}
+#include "customProtocol.h"
 
 /**
  * @brief Main function (Driver code)
