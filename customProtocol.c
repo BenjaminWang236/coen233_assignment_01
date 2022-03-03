@@ -179,6 +179,8 @@ bool data_packet_equals(data_packet_t *packet1, data_packet_t *packet2)
         return false;
     if (packet1->length != packet2->length)
         return false;
+    if (strlen(packet1->payload) != strlen(packet2->payload))
+        return false;
     if (strcmp(packet1->payload, packet2->payload) != 0)
         return false;
     if (packet1->end_packet != packet2->end_packet)
