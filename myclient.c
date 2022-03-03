@@ -1,0 +1,98 @@
+/**
+ * @file myclient.c
+ * @author Benjamin Wang (bwang4@scu.edu, ID: 1179478)
+ * @brief Client using customized protocol on top of UDP protocol for sending
+ * information to the server. Client side implementation of UDP client-server.
+ * @version 0.1
+ * @date 2022-03-02
+ *
+ * @copyright Copyright (c) 2022
+ * @source: https://www.linuxhowtos.org/C_C++/socket.htm
+ * @source: https://www.geeksforgeeks.org/udp-server-client-implementation-c/
+ *
+ */
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+
+#define PORT 8080
+#define MAXLINE 1024
+#define LINE_LENGTH 256
+
+/**
+ * @brief Error function
+ *
+ * @param msg Error message
+ */
+void error(const char *msg)
+{
+    perror(msg);
+    exit(0);
+}
+
+/**
+ * @brief Main function (Driver code)
+ *
+ * @param argc number of arguments
+ * @param argv arguments
+ * @return int 0 if successful
+ */
+int main(int argc, char *argv[])
+{
+    // Local variables
+    int sock, n;
+    struct sockaddr_in server, client;
+    unsigned int length = sizeof(struct sockaddr_in);
+    struct hostent *hp;
+    char buffer[LINE_LENGTH];
+
+    // Checking if usage is correct
+    if (argc != 3)
+    {
+        printf("Usage: server port\n");
+        exit(1);
+    }
+
+    // Create socket:
+    if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+        error("Error: socket");
+
+    // Filling server information
+    server.sin_family = AF_INET;
+    if ((hp = gethostbyname(argv[1])) == 0)
+        error("Error: Unknown host");
+    bcopy((char *)hp->h_addr,
+          (char *)&server.sin_addr,
+          hp->h_length);
+    server.sin_port = htons(atoi(argv[2]));
+    // server.sin_addr = htons(PORT)
+
+    // Getting the message from the user
+    // TODO: Replace with getline() from input files
+    printf("Please enter the message: ");
+    bzero(buffer, LINE_LENGTH);
+    fgets(buffer, LINE_LENGTH - 1, stdin);
+
+    // Send message to server
+    n = sendto(sock, buffer,
+               strlen(buffer), 0, (const struct sockaddr *)&server, length);
+    if (n < 0)
+        error("Error: Sendto");
+
+    // Receiving the response:
+    bzero(buffer, LINE_LENGTH);
+    n = recvfrom(sock, buffer, LINE_LENGTH, 0, (struct sockaddr *)&client, &length);
+    if (n < 0)
+        error("Error: recvfrom");
+    write(1, "Got an ack: ", 12);
+    write(1, buffer, n);
+    close(sock);
+    return 0;
+}

@@ -55,7 +55,10 @@ int main(int argc, char *argv[])
 
     // Checking if port number is provided
     if (argc < 2)
-        error("ERROR: no port provided");
+    {
+        fprintf(stderr, "ERROR: no port provided\n");
+        exit(EXIT_FAILURE);
+    }
 
     // Creating socket file descriptor
     if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
@@ -83,8 +86,6 @@ int main(int argc, char *argv[])
         n = recvfrom(sock, buf, MAXLINE, 0, (struct sockaddr *)&client, &clientlen);
         if (n < 0)
             error("ERROR: recvfrom");
-        // write(1, "Received a datagram: ", 21);
-        // write(1, buf, n);
         buf[n] = '\0';
         printf("Received a datagram: %s\n", buf);
 
