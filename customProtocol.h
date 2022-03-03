@@ -34,26 +34,29 @@
 #define MAX_PACKET_SIZE 0xFF
 
 // Custom Protocol Packet Types
-#define PACKET_DATA 0xFFF1
-#define PACKET_ACK 0xFFF2
-#define PACKET_REJECT 0xFFF3
+typedef enum
+{
+    PACKET_DATA = 0xFFF1,
+    PACKET_ACK,
+    PACKET_REJECT
+} PACKET_TYPE;
 // Custom Protocol Reject Sub-Codes
-#define REJECT_OUT_OF_SEQUENCE 0xFFF4
-#define REJECT_LENGTH_MISMATCH 0xFFF5
-#define REJECT_END_OF_PACKET_MISSING 0xFFF6
-#define REJECT_DUPLICATE_PACKET 0xFFF7
+typedef enum
+{
+    REJECT_OUT_OF_SEQUENCE = 0xFFF4,
+    REJECT_LENGTH_MISMATCH,
+    REJECT_END_OF_PACKET_MISSING,
+    REJECT_DUPLICATE_PACKET
+} REJECT_SUB_CODE;
 
 // Custom Protocol Packet Structure Sizes
-// #define PACKET_DATA_SIZE 264
-// #define PACKET_ACK_SIZE 8
-// #define PACKET_REJECT_SIZE 10
 #define PACKET_DATA_PAYLOAD_SIZE 255
 
 // Custom Protocol Meta-Settings
 #define PACKET_GROUP_SIZE 5
 #define ACK_TIMER_WAIT_TIME_MS 3000
 #define ACK_TIMER_RETRY_COUNT 3
-#define MAXLINE 1024 // Not used
+#define MAXLINE 1024
 #define LINE_LENGTH 256
 
 // Custom Protocol Packet Structures:
@@ -61,7 +64,7 @@ typedef struct
 {
     uint16_t start_packet;
     uint8_t client_id;
-    uint16_t packet_type;
+    PACKET_TYPE packet_type;
     uint8_t segment_no;
     uint8_t length;
     uint8_t payload[PACKET_DATA_PAYLOAD_SIZE];
@@ -72,7 +75,7 @@ typedef struct
 {
     uint16_t start_packet;
     uint8_t client_id;
-    uint16_t packet_type;
+    PACKET_TYPE packet_type;
     uint8_t received_segment_no;
     uint16_t end_packet;
 } ack_packet_t;
@@ -81,8 +84,8 @@ typedef struct
 {
     uint16_t start_packet;
     uint8_t client_id;
-    uint16_t packet_type;
-    uint16_t sub_code;
+    PACKET_TYPE packet_type;
+    REJECT_SUB_CODE sub_code;
     uint8_t received_segment_no;
     uint16_t end_packet;
 } reject_packet_t;
@@ -94,6 +97,9 @@ typedef struct
  */
 void error(const char *msg);
 
+/**
+ * @brief Timeout function, testing purposes only
+ */
 void timeout(void);
 
 #endif
