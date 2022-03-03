@@ -93,9 +93,9 @@ int main(int argc, char *argv[])
         // TODO: Check for all 4 error-cases!
 
         // Sending response back to Client
-        // TODO: Change MSG_CONFIRM to to custom message
+        // TODO: Change hello to to custom response
         n = sendto(sock, (const char *)hello, strlen(hello),
-                   MSG_CONFIRM, (struct sockaddr *)&client, clientlen);
+                   0, (const struct sockaddr *)&client, clientlen);
         if (n < 0)
             error("ERROR: sendto");
     }
