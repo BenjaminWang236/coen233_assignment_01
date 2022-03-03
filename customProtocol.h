@@ -2,7 +2,7 @@
  * @file customProtocol.h
  * @author Benjamin Wang (bwang4@scu.edu, ID: 1179478)
  * @brief Client using customized protocol on top of UDP protocol for sending
- * information to the server. Header file defining the custom protocol's Primitives
+ * information to the server. Header file defining the CUSTOM PROTOCOL
  * @date 2022-03-02
  *
  * @copyright Copyright (c) 2022
@@ -69,7 +69,8 @@ typedef struct
     uint8_t length;
     uint8_t payload[PACKET_DATA_PAYLOAD_SIZE];
     uint16_t end_packet;
-} data_packet_t;
+} data_packet_t; // Size 266
+// } __attribute__((packed)) data_packet_t; // Size 266
 
 typedef struct
 {
@@ -78,7 +79,7 @@ typedef struct
     PACKET_TYPE packet_type;
     uint8_t received_segment_no;
     uint16_t end_packet;
-} ack_packet_t;
+} __attribute__((packed)) ack_packet_t; // Size 8
 
 typedef struct
 {
@@ -88,7 +89,7 @@ typedef struct
     REJECT_SUB_CODE sub_code;
     uint8_t received_segment_no;
     uint16_t end_packet;
-} reject_packet_t;
+} __attribute__((packed)) reject_packet_t; // Size 10
 
 /**
  * @brief Error function

@@ -24,6 +24,10 @@ int main(int argc, char *argv[])
     // Define variables
 
     // printf("Test: Rej Out of Seq:\t0x%04X\n", REJECT_OUT_OF_SEQUENCE);
+    // printf("Test: hostname: %s\n", HOSTNAME);
+    printf("Test: data_packet_t size: %i\n", (int)sizeof(data_packet_t));
+    printf("Test: ack_packet_t size: %i\n", (int)sizeof(ack_packet_t));
+    printf("Test: reject_packet_t size: %i\n", (int)sizeof(reject_packet_t));
 
     return EXIT_SUCCESS;
 }
