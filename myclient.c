@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
     if (n < 0)
         error("Error: recvfrom");
     buffer[n] = '\0';
-    printf("Got response from server: %s\n", buffer);
+    printf("Got response from server: %s", buffer);
 
     // Close the socket (Housekeeping)
     close(sock);

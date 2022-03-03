@@ -39,7 +39,8 @@ int main(int argc, char *argv[])
     else
         printf("Test: data_packet is invalid\n");
     // printf("payload: %s\n", data_packet.payload);
-    printf("data_packet_to_string: %s\n", data_packet_to_string(&data_packet));
+    printf("data_packet_to_string: %s", data_packet_to_string(&data_packet));
+    printf("payload length: strlen: %lu\tsizeof: %lu\n", strlen(data_packet.payload), sizeof(data_packet.payload));
 #endif
 
     return EXIT_SUCCESS;

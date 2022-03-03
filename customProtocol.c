@@ -150,7 +150,9 @@ void update_data_packet(data_packet_t *packet, uint8_t client_id, uint8_t segmen
     packet->client_id = client_id;
     packet->segment_no = segment_no;
     packet->length = length;
+#ifdef DEBUGGING
     printf("RECEIVED LENGTH: %d\n", length);
+#endif
     memcpy(packet->payload, payload, length);
 }
 void update_ack_packet(ack_packet_t *packet, uint8_t client_id, uint8_t received_segment_no)
@@ -163,6 +165,25 @@ void update_reject_packet(reject_packet_t *packet, uint8_t client_id, REJECT_SUB
     packet->client_id = client_id;
     packet->sub_code = sub_code;
     packet->received_segment_no = received_segment_no;
+}
+
+bool data_packet_equals(data_packet_t *packet1, data_packet_t *packet2)
+{
+    if (packet1->start_packet != packet2->start_packet)
+        return false;
+    if (packet1->client_id != packet2->client_id)
+        return false;
+    if (packet1->packet_type != packet2->packet_type)
+        return false;
+    if (packet1->segment_no != packet2->segment_no)
+        return false;
+    if (packet1->length != packet2->length)
+        return false;
+    if (strcmp(packet1->payload, packet2->payload) != 0)
+        return false;
+    if (packet1->end_packet != packet2->end_packet)
+        return false;
+    return true;
 }
 
 char *data_packet_to_string(data_packet_t *packet)

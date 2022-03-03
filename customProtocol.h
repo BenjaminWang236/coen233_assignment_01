@@ -39,6 +39,7 @@
 #define MAXLINE 1024
 #define LINE_LENGTH 256
 #define DEFAULT_VALUE 0
+#define PACKET_OK 0
 
 // Custom Protocol Primitives
 #define START_PACKET 0xFFFF
@@ -121,6 +122,9 @@ void reset_reject_packet(reject_packet_t *packet);
 void update_data_packet(data_packet_t *packet, uint8_t client_id, uint8_t segment_no, uint8_t length, char *payload);
 void update_ack_packet(ack_packet_t *packet, uint8_t client_id, uint8_t received_segment_no);
 void update_reject_packet(reject_packet_t *packet, uint8_t client_id, REJECT_SUB_CODE sub_code, uint8_t received_segment_no);
+
+// Data Packet Comparison Equal method: For checking duplicate packets
+bool data_packet_equals(data_packet_t *packet1, data_packet_t *packet2);
 
 // ToString Sizes, gathered from compiler warnings:
 #define DATA_PACKET_STRING_SIZE 355

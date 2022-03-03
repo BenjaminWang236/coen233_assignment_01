@@ -14,6 +14,32 @@
 
 #include "customProtocol.h"
 
+uint16_t validate_client_data_packet(bool *packet_seq_started, uint8_t *packet_seq_num, data_packet_t *curr_data, data_packet_t *prev_data)
+{
+    if (*packet_seq_started && curr_data->segment_no != (*packet_seq_num + 1))
+    {
+        printf("ERROR: Out of order packet!\n");
+        return REJECT_OUT_OF_SEQUENCE;
+    }
+    if (strlen(curr_data->payload) != curr_data->length)
+    {
+        printf("ERROR: Length Mismatch!\n");
+        return REJECT_LENGTH_MISMATCH;
+    }
+    if (curr_data->end_packet != END_PACKET)
+    {
+        printf("ERROR: End of Packet Missing!\n");
+        return REJECT_END_OF_PACKET_MISSING;
+    }
+    if (*packet_seq_started && data_packet_equals(curr_data, prev_data))
+    {
+        printf("ERROR: Duplicate packet received!\n");
+        return REJECT_DUPLICATE_PACKET;
+    }
+
+    return PACKET_OK;
+}
+
 /**
  * @brief Main function (Driver code)
  *
@@ -27,8 +53,8 @@ int main(int argc, char *argv[])
     int sock, length, n, port;
     socklen_t clientlen;
     struct sockaddr_in server, client;
-    char buf[MAXLINE];
-    char *hello = "Hello from server";
+    // char buf[MAXLINE];
+    // char *hello = "Hello from server";
 
     // Checking if port number is provided
     if (argc == 1)
@@ -60,9 +86,19 @@ int main(int argc, char *argv[])
     clientlen = sizeof(client);
     bzero(&client, clientlen);
 
-    // Custom protocol's Data Packet:
+    // Custom protocol's Packets:
     data_packet_t data_packet = {};
     size_t data_packet_size = sizeof(data_packet);
+    ack_packet_t ack_packet = {};
+    size_t ack_packet_size = sizeof(ack_packet);
+    reject_packet_t reject_packet = {};
+    size_t reject_packet_size = sizeof(reject_packet);
+    data_packet_t prev_data_packet = {}; // For checking duplicates
+
+    // Packet Tracker:
+    bool packet_seq_started = false;
+    uint8_t packet_seq_num = 0;
+    uint16_t packet_OK = 1;
 
     // Server runs forever, I guess
     while (1)
@@ -71,19 +107,51 @@ int main(int argc, char *argv[])
         n = recvfrom(sock, &data_packet, data_packet_size, 0, (struct sockaddr *)&client, &clientlen);
         if (n < 0)
             error("ERROR: recvfrom");
-        // TODO: Replace below print buffer with custom print struct data_packet_t
-        buf[n] = '\0';
-        printf("Received a datagram: %s\n", buf);
+        // buf[n] = '\0';
+        // printf("Received a datagram: %s\n", buf);
+#ifdef DEBUGGING
+        printf("Received data packet: %s", data_packet_to_string(&data_packet));
+#endif
 
-        // ACK or REJ logic here:
-        // TODO: Check for all 4 error-cases!
+        // ACK or REJ logic here: All 4 Server Reject Sub-Code cases are handled here
+        packet_OK = validate_client_data_packet(&packet_seq_started, &packet_seq_num, &data_packet, &prev_data_packet);
 
-        // Sending response back to Client
-        // TODO: Change hello to to custom response
-        n = sendto(sock, (const char *)hello, strlen(hello),
-                   0, (const struct sockaddr *)&client, clientlen);
+        if (packet_OK == PACKET_OK)
+        {
+            // Tracking the packet sequence: Since packet's valid
+            if (!packet_seq_started)
+                packet_seq_started = true;
+            else if (packet_seq_started && packet_seq_num >= (PACKET_GROUP_SIZE - 1))
+            {
+                packet_seq_num = 0;
+                packet_seq_started = false;
+            }
+            else
+                packet_seq_num = data_packet.segment_no;
+
+            // Saving the current packet as next "prev_data_packet" for duplicate checking
+            memset(&prev_data_packet, 0, data_packet_size);
+            memcpy(&prev_data_packet, &data_packet, data_packet_size);
+
+            // ACK packet response:
+            reset_ack_packet(&ack_packet);
+            update_ack_packet(&ack_packet, data_packet.client_id, packet_seq_num);
+            // Sending ACK response back to Client
+            n = sendto(sock, (const ack_packet_t *)&ack_packet, ack_packet_size,
+                       0, (const struct sockaddr *)&client, clientlen);
+        }
+        else
+        {
+            // REJ packet response:
+            reset_reject_packet(&reject_packet);
+            update_reject_packet(&reject_packet, data_packet.client_id, packet_OK, data_packet.segment_no);
+            // Sending ACK response back to Client
+            n = sendto(sock, (const reject_packet_t *)&reject_packet_size, reject_packet_size,
+                       0, (const struct sockaddr *)&client, clientlen);
+        }
         if (n < 0)
             error("ERROR: sendto");
+        return EXIT_SUCCESS;
     }
-    return EXIT_SUCCESS;
 }
+                
