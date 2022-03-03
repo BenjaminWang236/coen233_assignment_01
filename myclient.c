@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
         error("Error: Sendto");
 
     // Receiving the response:
-    bzero(buffer, LINE_LENGTH);
+    bzero(buffer, LINE_LENGTH); // Sanitize buffer
     n = recvfrom(sock, buffer, LINE_LENGTH, 0, (struct sockaddr *)&client, &length);
     if (n < 0)
         error("Error: recvfrom");
