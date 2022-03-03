@@ -8,6 +8,7 @@
  * @copyright Copyright (c) 2022
  *
  */
+
 #ifndef CUSTOMPROTOCOL_H /* include guard */
 #define CUSTOMPROTOCOL_H
 
@@ -25,6 +26,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
+#include <stdbool.h>
 
 // Port and Hostname:
 #define PORT 8080
@@ -36,6 +38,7 @@
 #define ACK_TIMER_RETRY_COUNT 3
 #define MAXLINE 1024
 #define LINE_LENGTH 256
+#define DEFAULT_VALUE 0
 
 // Custom Protocol Primitives
 #define START_PACKET 0xFFFF
@@ -69,7 +72,7 @@ typedef struct
     PACKET_TYPE packet_type;
     uint8_t segment_no;
     uint8_t length;
-    uint8_t payload[PACKET_DATA_PAYLOAD_SIZE];
+    char payload[PACKET_DATA_PAYLOAD_SIZE];
     uint16_t end_packet;
 } __attribute__((packed)) data_packet_t; // Size 266
 
@@ -104,12 +107,18 @@ void error(const char *msg);
  */
 void timeout(void);
 
-// TODO: Add struct accessors:
-void reset_data_packet(data_packet_t *packet, uint8_t client_id, uint8_t segment_no, uint8_t length, uint8_t *payload);
-void reset_ack_packet(ack_packet_t *packet, uint8_t client_id, uint8_t received_segment_no);
-void reset_reject_packet(reject_packet_t *packet, uint8_t client_id, REJECT_SUB_CODE sub_code, uint8_t received_segment_no);
+// Validating that packet is correct
+bool is_valid_data_packet(data_packet_t *packet);
+bool is_valid_ack_packet(ack_packet_t *packet);
+bool is_valid_reject_packet(reject_packet_t *packet);
 
-void update_data_packet(data_packet_t *packet, uint8_t client_id, uint8_t segment_no, uint8_t length, uint8_t *payload);
+// Packet reset to default values. Clear payload array if it exists.
+void reset_data_packet(data_packet_t *packet);
+void reset_ack_packet(ack_packet_t *packet);
+void reset_reject_packet(reject_packet_t *packet);
+
+// Packet setters. Note: Should call reset() before setting values.
+void update_data_packet(data_packet_t *packet, uint8_t client_id, uint8_t segment_no, uint8_t length, char *payload);
 void update_ack_packet(ack_packet_t *packet, uint8_t client_id, uint8_t received_segment_no);
 void update_reject_packet(reject_packet_t *packet, uint8_t client_id, REJECT_SUB_CODE sub_code, uint8_t received_segment_no);
 
