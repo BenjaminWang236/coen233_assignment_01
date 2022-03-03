@@ -11,6 +11,9 @@
 #ifndef CUSTOMPROTOCOL_H /* include guard */
 #define CUSTOMPROTOCOL_H
 
+// Debug flag
+#define DEBUGGING 0
+
 // library includes
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -69,8 +72,7 @@ typedef struct
     uint8_t length;
     uint8_t payload[PACKET_DATA_PAYLOAD_SIZE];
     uint16_t end_packet;
-} data_packet_t; // Size 266
-// } __attribute__((packed)) data_packet_t; // Size 266
+} __attribute__((packed)) data_packet_t; // Size 266
 
 typedef struct
 {
@@ -102,5 +104,46 @@ void error(const char *msg);
  * @brief Timeout function, testing purposes only
  */
 void timeout(void);
+
+// TODO: Add struct accessors:
+// Can just do data_packet_t data_packet = {};
+// data_packet_t create_data_packet(uint8_t client_id, uint8_t segment_no, uint8_t length, uint8_t *payload);
+// ack_packet_t create_ack_packet(uint8_t client_id, uint8_t received_segment_no);
+// reject_packet_t create_reject_packet(uint8_t client_id, REJECT_SUB_CODE sub_code, uint8_t received_segment_no);
+
+void reset_data_packet(data_packet_t *packet, uint8_t client_id, uint8_t segment_no, uint8_t length, uint8_t *payload);
+void reset_ack_packet(ack_packet_t *packet, uint8_t client_id, uint8_t received_segment_no);
+void reset_reject_packet(reject_packet_t *packet, uint8_t client_id, REJECT_SUB_CODE sub_code, uint8_t received_segment_no);
+
+void update_data_packet(data_packet_t *packet, uint8_t client_id, uint8_t segment_no, uint8_t length, uint8_t *payload);
+void update_ack_packet(ack_packet_t *packet, uint8_t client_id, uint8_t received_segment_no);
+void update_reject_packet(reject_packet_t *packet, uint8_t client_id, REJECT_SUB_CODE sub_code, uint8_t received_segment_no);
+
+// ToString Sizes, gathered from compiler warnings:
+#define DATA_PACKET_STRING_SIZE 347
+#define ACK_PACKET_STRING_SIZE 82
+#define REJECT_PACKET_STRING_SIZE 97
+// NOTE: MUST BE FOLLOWED BY A FREE() CALL TO PREVENT MEMORY LEAKS
+/**
+ * @brief Convert DATA packet to string
+ * 
+ * @param packet data_packet_t packet to convert
+ * @return char* string representation of packet
+ */
+char* data_packet_to_string(data_packet_t *packet);
+/**
+ * @brief Convert ACK packet to string
+ * 
+ * @param packet ack_packet_t packet to convert
+ * @return char* string representation of packet
+ */
+char* ack_packet_to_string(ack_packet_t *packet);
+/**
+ * @brief Convert REJECT packet to string
+ * 
+ * @param packet reject_packet_t packet to convert
+ * @return char* string representation of packet
+ */
+char* reject_packet_to_string(reject_packet_t *packet);
 
 #endif

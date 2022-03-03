@@ -60,12 +60,18 @@ int main(int argc, char *argv[])
     clientlen = sizeof(client);
     bzero(&client, clientlen);
 
+    // Custom protocol's Data Packet:
+    data_packet_t data_packet = {};
+    size_t data_packet_size = sizeof(data_packet);
+
     // Server runs forever, I guess
     while (1)
     {
-        n = recvfrom(sock, buf, MAXLINE, 0, (struct sockaddr *)&client, &clientlen);
+        memset(&data_packet, 0, data_packet_size);
+        n = recvfrom(sock, &data_packet, data_packet_size, 0, (struct sockaddr *)&client, &clientlen);
         if (n < 0)
             error("ERROR: recvfrom");
+        // TODO: Replace below print buffer with custom print struct data_packet_t
         buf[n] = '\0';
         printf("Received a datagram: %s\n", buf);
 
