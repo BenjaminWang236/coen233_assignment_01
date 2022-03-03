@@ -26,20 +26,6 @@ void timeout(void)
 }
 
 // TODO: Add struct accessors:
-// Can just do data_packet_t data_packet = {};
-// data_packet_t create_data_packet(uint8_t client_id, uint8_t segment_no, uint8_t length, uint8_t *payload)
-// {
-//     //
-// }
-// ack_packet_t create_ack_packet(uint8_t client_id, uint8_t received_segment_no)
-// {
-//     //
-// }
-// reject_packet_t create_reject_packet(uint8_t client_id, REJECT_SUB_CODE sub_code, uint8_t received_segment_no)
-// {
-//     //
-// }
-
 void reset_data_packet(data_packet_t *packet, uint8_t client_id, uint8_t segment_no, uint8_t length, uint8_t *payload)
 {
     //

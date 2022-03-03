@@ -30,6 +30,13 @@
 #define PORT 8080
 #define HOSTNAME "localhost"
 
+// Custom Protocol Meta-Settings
+#define PACKET_GROUP_SIZE 5
+#define ACK_TIMER_WAIT_TIME_MS 3000
+#define ACK_TIMER_RETRY_COUNT 3
+#define MAXLINE 1024
+#define LINE_LENGTH 256
+
 // Custom Protocol Primitives
 #define START_PACKET 0xFFFF
 #define END_PACKET 0xFFFF
@@ -54,14 +61,6 @@ typedef enum
 
 // Custom Protocol Packet Structure Sizes
 #define PACKET_DATA_PAYLOAD_SIZE 255
-
-// Custom Protocol Meta-Settings
-#define PACKET_GROUP_SIZE 5
-#define ACK_TIMER_WAIT_TIME_MS 3000
-#define ACK_TIMER_RETRY_COUNT 3
-#define MAXLINE 1024
-#define LINE_LENGTH 256
-
 // Custom Protocol Packet Structures:
 typedef struct
 {
@@ -106,11 +105,6 @@ void error(const char *msg);
 void timeout(void);
 
 // TODO: Add struct accessors:
-// Can just do data_packet_t data_packet = {};
-// data_packet_t create_data_packet(uint8_t client_id, uint8_t segment_no, uint8_t length, uint8_t *payload);
-// ack_packet_t create_ack_packet(uint8_t client_id, uint8_t received_segment_no);
-// reject_packet_t create_reject_packet(uint8_t client_id, REJECT_SUB_CODE sub_code, uint8_t received_segment_no);
-
 void reset_data_packet(data_packet_t *packet, uint8_t client_id, uint8_t segment_no, uint8_t length, uint8_t *payload);
 void reset_ack_packet(ack_packet_t *packet, uint8_t client_id, uint8_t received_segment_no);
 void reset_reject_packet(reject_packet_t *packet, uint8_t client_id, REJECT_SUB_CODE sub_code, uint8_t received_segment_no);
