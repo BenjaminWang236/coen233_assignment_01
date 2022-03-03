@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     printf("Test: data_packet_t size: %i\n", (int)sizeof(data_packet_t));
     printf("Test: ack_packet_t size: %i\n", (int)sizeof(ack_packet_t));
     printf("Test: reject_packet_t size: %i\n", (int)sizeof(reject_packet_t));
-    // timeout();
+    timeout();
     char *hello = "Hello World!";
     data_packet_t data_packet = {};
     reset_data_packet(&data_packet);

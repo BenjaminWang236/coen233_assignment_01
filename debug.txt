@@ -1,0 +1,19 @@
+Test: Rej Dup Packet:	0xFFF7
+Test: hostname: localhost
+Test: data_packet_t size: 264
+Test: ack_packet_t size: 8
+Test: reject_packet_t size: 10
+Timeout: 3 seconds
+Timeout reached
+RECEIVED LENGTH: 12
+Error: Invalid segment number 5
+Test: data_packet is invalid
+data_packet_to_string: 
+start=	0xFFFF
+client_id=	255
+packet_type=	0xFFF1
+segment_no=	5
+length=	12
+payload=	Hello World!
+end=	0xFFFF
+payload length: strlen: 12	sizeof: 255
