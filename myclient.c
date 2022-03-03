@@ -34,7 +34,7 @@
 void error(const char *msg)
 {
     perror(msg);
-    exit(0);
+    exit(EXIT_FAILURE);
 }
 
 /**
@@ -91,8 +91,10 @@ int main(int argc, char *argv[])
     n = recvfrom(sock, buffer, LINE_LENGTH, 0, (struct sockaddr *)&client, &length);
     if (n < 0)
         error("Error: recvfrom");
-    write(1, "Got an ack: ", 12);
-    write(1, buffer, n);
+    buffer[n] = '\0';
+    printf("Got response from server: %s\n", buffer);
+
+    // Close the socket (Housekeeping)
     close(sock);
-    return 0;
+    return EXIT_SUCCESS;
 }
