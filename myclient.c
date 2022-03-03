@@ -23,7 +23,7 @@
 #include <string.h>
 
 #define PORT 8080
-#define MAXLINE 1024
+#define MAXLINE 1024    // Not used
 #define LINE_LENGTH 256
 
 /**
