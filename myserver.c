@@ -47,14 +47,18 @@ void error(const char *msg)
 int main(int argc, char *argv[])
 {
     // Define variables
-    int sock, length, n;
+    int sock, length, n, port;
     socklen_t clientlen;
     struct sockaddr_in server, client;
     char buf[MAXLINE];
     char *hello = "Hello from server";
 
     // Checking if port number is provided
-    if (argc < 2)
+    if (argc == 1)
+        port = PORT;
+    else if (argc == 2)
+        port = atoi(argv[1]);
+    else
     {
         fprintf(stderr, "ERROR: no port provided\n");
         exit(EXIT_FAILURE);
@@ -69,8 +73,7 @@ int main(int argc, char *argv[])
     bzero(&server, length); // memset(&servaddr, 0, length);
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_port = htons(atoi(argv[1]));
-    // server.sin_port = htons(PORT);
+    server.sin_port = htons(port);
 
     // Bind the socket with the server address
     if (bind(sock, (struct sockaddr *)&server, length) < 0)

@@ -47,18 +47,25 @@ void error(const char *msg)
 int main(int argc, char *argv[])
 {
     // Local variables
-    int sock, n;
+    int sock, n, port;
     struct sockaddr_in server, client;
     unsigned int length = sizeof(struct sockaddr_in);
     struct hostent *hp;
     char buffer[LINE_LENGTH];
 
+    // Default port number and hostname
+    char *host = "localhost";
+    port = 8080;
+
     // Checking if usage is correct
-    if (argc != 3)
+    if (argc != 2)
     {
-        printf("Usage: server port\n");
-        exit(1);
+        printf("Usage: input_file\n");
+        exit(EXIT_FAILURE);
     }
+
+    // Reading input file:
+
 
     // Create socket:
     if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
@@ -66,12 +73,12 @@ int main(int argc, char *argv[])
 
     // Filling server information
     server.sin_family = AF_INET;
-    if ((hp = gethostbyname(argv[1])) == 0)
+    if ((hp = gethostbyname((const char*)host)) == 0)
         error("Error: Unknown host");
     bcopy((char *)hp->h_addr,
           (char *)&server.sin_addr,
           hp->h_length);
-    server.sin_port = htons(atoi(argv[2]));
+    server.sin_port = htons(port);
     // server.sin_addr = htons(PORT)
 
     // Getting the message from the user
