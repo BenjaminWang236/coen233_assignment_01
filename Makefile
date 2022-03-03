@@ -8,25 +8,25 @@ CC = gcc
 CFLAGS  = -g -Wall -fshort-enums
 
 # the build target executable:
+HEADER = customProtocol
 TARGET = myclient myserver generateTestInputs
 
-HEADER = customProtocol.c
 
 all: $(TARGET)
 
 $(TARGET): %: %.c
-	$(CC) $(CFLAGS) -o $@ $< $(HEADER)
+	$(CC) $(CFLAGS) -o $@ $< $(HEADER).c
 
 cs: client server
 
 client: myclient.c
-	$(CC) $(CFLAGS) -o myclient myclient.c $(HEADER)
+	$(CC) $(CFLAGS) -o myclient myclient.c $(HEADER).c
 
 server: myserver.c
-	$(CC) $(CFLAGS) -o myserver myserver.c $(HEADER)
+	$(CC) $(CFLAGS) -o myserver myserver.c $(HEADER).c
 
-generate: generateTestInputs.c
-	$(CC) $(CFLAGS) -o generateTestInputs generateTestInputs.C $(HEADER)
+generator: generateTestInputs.c
+	$(CC) $(CFLAGS) -o generateTestInputs generateTestInputs.C $(HEADER).c
 
 clean:
 	$(RM) $(TARGET)
