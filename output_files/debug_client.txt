@@ -1,0 +1,38 @@
+Please enter the message: DATA LENGTH: 5
+Received ACK packet: 
+start=	0xFFFF
+client_id=	123
+packet_type=	0xFFF2
+received_segment_no=	0
+end=	0xFFFF
+Please enter the message: DATA LENGTH: 15
+Raw reject packet: 0x                                F4BCC070
+Error: Invalid start packet 0x000A
+ERROR: REJ packet formatted improperly!
+Received REJECT packet: 
+start=	0x000A
+client_id=	0
+packet_type=	0x0000
+sub_code=	0000
+received_segment_no=	0
+end=	0xFFFF
+
+Please enter the message: DATA LENGTH: 4
+Received ACK packet: 
+start=	0xFFFF
+client_id=	123
+packet_type=	0xFFF2
+received_segment_no=	0
+end=	0xFFFF
+Please enter the message: DATA LENGTH: 7
+Raw reject packet: 0x                                1818EE90
+Error: Invalid start packet 0x000A
+ERROR: REJ packet formatted improperly!
+Received REJECT packet: 
+start=	0x000A
+client_id=	0
+packet_type=	0x0000
+sub_code=	0000
+received_segment_no=	0
+end=	0xFFFF
+

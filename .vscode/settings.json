@@ -9,6 +9,7 @@
         "stdio.h": "c",
         "in.h": "c",
         "customprotocol.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "cstdio": "c"
     }
 }

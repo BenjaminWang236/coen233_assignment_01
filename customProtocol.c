@@ -191,11 +191,11 @@ bool data_packet_equals(data_packet_t *packet1, data_packet_t *packet2)
 char *data_packet_to_string(data_packet_t *packet)
 {
     // char string[347] = {}; // Size from compiler warning
-    char *string = malloc(sizeof(char) * (DATA_PACKET_STRING_SIZE + 1));
-    memset(string, DEFAULT_VALUE, DATA_PACKET_STRING_SIZE + 1);
-    snprintf(
-        string,
-        DATA_PACKET_STRING_SIZE,
+    char *str = malloc(sizeof(char) * (DATA_PACKET_STRING_SIZE + 1));
+    memset(str, DEFAULT_VALUE, DATA_PACKET_STRING_SIZE + 1);
+    sprintf(
+        str,
+        // DATA_PACKET_STRING_SIZE,
         "\nstart=\t0x%04X\nclient_id=\t%hu\npacket_type=\t0x%04X\nsegment_no=\t%hu\nlength=\t%hu\npayload=\t%s\nend=\t0x%04X\n",
         packet->start_packet,
         packet->client_id,
@@ -204,34 +204,34 @@ char *data_packet_to_string(data_packet_t *packet)
         packet->length,
         packet->payload,
         packet->end_packet);
-    string[DATA_PACKET_STRING_SIZE] = '\0';
-    return string;
+    str[DATA_PACKET_STRING_SIZE] = '\0';
+    return str;
 }
 char *ack_packet_to_string(ack_packet_t *packet)
 {
     // char string[82] = {}; // Size from compiler warning
-    char *string = malloc(sizeof(char) * (ACK_PACKET_STRING_SIZE + 1));
-    memset(string, DEFAULT_VALUE, ACK_PACKET_STRING_SIZE + 1);
-    snprintf(
-        string,
-        ACK_PACKET_STRING_SIZE,
+    char *str = malloc(sizeof(char) * (ACK_PACKET_STRING_SIZE + 1));
+    memset(str, DEFAULT_VALUE, ACK_PACKET_STRING_SIZE + 1);
+    sprintf(
+        str,
+        // ACK_PACKET_STRING_SIZE,
         "\nstart=\t0x%04X\nclient_id=\t%hu\npacket_type=\t0x%04X\nreceived_segment_no=\t%hu\nend=\t0x%04X\n",
         packet->start_packet,
         packet->client_id,
         (uint16_t)packet->packet_type,
         packet->received_segment_no,
         packet->end_packet);
-    string[ACK_PACKET_STRING_SIZE] = '\0';
-    return string;
+    str[ACK_PACKET_STRING_SIZE] = '\0';
+    return str;
 }
 char *reject_packet_to_string(reject_packet_t *packet)
 {
     // char string[97] = {}; // Size from compiler warning
-    char *string = malloc(sizeof(char) * (REJECT_PACKET_STRING_SIZE + 1));
-    memset(string, DEFAULT_VALUE, REJECT_PACKET_STRING_SIZE + 1);
-    snprintf(
-        string,
-        REJECT_PACKET_STRING_SIZE,
+    char *str = malloc(sizeof(char) * (REJECT_PACKET_STRING_SIZE + 1));
+    memset(str, DEFAULT_VALUE, REJECT_PACKET_STRING_SIZE + 1);
+    sprintf(
+        str,
+        // REJECT_PACKET_STRING_SIZE,
         "\nstart=\t0x%04X\nclient_id=\t%hu\npacket_type=\t0x%04X\nsub_code=\t%04X\nreceived_segment_no=\t%hu\nend=\t0x%04X\n",
         packet->start_packet,
         packet->client_id,
@@ -239,6 +239,6 @@ char *reject_packet_to_string(reject_packet_t *packet)
         (uint16_t)packet->sub_code,
         packet->received_segment_no,
         packet->end_packet);
-    string[REJECT_PACKET_STRING_SIZE] = '\0';
-    return string;
+    str[REJECT_PACKET_STRING_SIZE] = '\0';
+    return str;
 }

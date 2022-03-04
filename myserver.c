@@ -110,7 +110,9 @@ int main(int argc, char *argv[])
             // buf[n] = '\0';
             // printf("Received a datagram: %s\n", buf);
 #ifdef DEBUGGING
-        printf("Received data packet: %s", data_packet_to_string(&data_packet));
+        char *data_str = data_packet_to_string(&data_packet);
+        printf("Received data packet: %s", data_str);
+        free(data_str);
 #endif
 
         // ACK or REJ logic here: All 4 Server Reject Sub-Code cases are handled here
@@ -140,7 +142,7 @@ int main(int argc, char *argv[])
             reset_ack_packet(&ack_packet);
             update_ack_packet(&ack_packet, data_packet.client_id, packet_seq_num);
             // Sending ACK response back to Client
-            n = sendto(sock, (const ack_packet_t *)&ack_packet, ack_packet_size,
+            n = sendto(sock, &ack_packet, ack_packet_size,
                        0, (const struct sockaddr *)&client, clientlen);
         }
         else
@@ -156,13 +158,18 @@ int main(int argc, char *argv[])
                 printf("REJ packet formatted properly!\n");
             else
                 printf("ERROR: REJ packet formatted improperly!\n");
+            char *rej_str = reject_packet_to_string(&reject_packet);
+            printf("Sending response REJ packet: %s\n", rej_str);
+            free(rej_str);
 #endif
             // Sending ACK response back to Client
-            n = sendto(sock, (const reject_packet_t *)&reject_packet_size, reject_packet_size,
+            n = sendto(sock, &reject_packet, reject_packet_size,
                        0, (const struct sockaddr *)&client, clientlen);
         }
         if (n < 0)
             error("ERROR: sendto");
     }
+
+    close(sock);
     return EXIT_SUCCESS;
 }
