@@ -107,8 +107,8 @@ int main(int argc, char *argv[])
         n = recvfrom(sock, &data_packet, data_packet_size, 0, (struct sockaddr *)&client, &clientlen);
         if (n < 0)
             error("ERROR: recvfrom");
-        // buf[n] = '\0';
-        // printf("Received a datagram: %s\n", buf);
+            // buf[n] = '\0';
+            // printf("Received a datagram: %s\n", buf);
 #ifdef DEBUGGING
         printf("Received data packet: %s", data_packet_to_string(&data_packet));
 #endif
@@ -151,6 +151,12 @@ int main(int argc, char *argv[])
             // REJ packet response:
             reset_reject_packet(&reject_packet);
             update_reject_packet(&reject_packet, data_packet.client_id, packet_status, data_packet.segment_no);
+#ifdef DEBUGGING
+            if (is_valid_reject_packet(&reject_packet))
+                printf("REJ packet formatted properly!\n");
+            else
+                printf("ERROR: REJ packet formatted improperly!\n");
+#endif
             // Sending ACK response back to Client
             n = sendto(sock, (const reject_packet_t *)&reject_packet_size, reject_packet_size,
                        0, (const struct sockaddr *)&client, clientlen);
@@ -160,4 +166,3 @@ int main(int argc, char *argv[])
     }
     return EXIT_SUCCESS;
 }
-                

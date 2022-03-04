@@ -25,10 +25,11 @@ int main(int argc, char *argv[])
 {
     // Local variables
     int sock, n, port;
-    struct sockaddr_in server, client;
+    struct sockaddr_in server, recv_from;
     unsigned int length = sizeof(struct sockaddr_in);
     struct hostent *hp;
     char buffer[sizeof(data_packet_t)];
+    uint8_t rec_buff[sizeof(data_packet_t)];
 
     // Default port number and hostname
     char *host = HOSTNAME;
@@ -66,6 +67,10 @@ int main(int argc, char *argv[])
     uint8_t client_id = 123, seg_no = 0, buffLen = strlen(buffer);
     data_packet_t data_packet = {};
     size_t data_packet_size = sizeof(data_packet);
+    ack_packet_t ack_packet = {};
+    size_t ack_packet_size = sizeof(ack_packet);
+    reject_packet_t reject_packet = {};
+    size_t reject_packet_size = sizeof(reject_packet);
     reset_data_packet(&data_packet);
     update_data_packet(&data_packet, client_id, seg_no, buffLen, buffer);
 
@@ -75,13 +80,47 @@ int main(int argc, char *argv[])
     if (n < 0)
         error("Error: Sendto");
 
+    // TODO: ACK_TIMER here with timer 3000 ms & max_resend_count 3
+
     // Receiving the response:
-    bzero(buffer, LINE_LENGTH); // Sanitize buffer
-    n = recvfrom(sock, buffer, LINE_LENGTH, 0, (struct sockaddr *)&client, &length);
+    bzero(rec_buff, data_packet_size); // Sanitize buffer
+    n = recvfrom(sock, rec_buff, data_packet_size, 0, (struct sockaddr *)&recv_from, &length);
     if (n < 0)
         error("Error: recvfrom");
-    buffer[n] = '\0';
-    printf("Got response from server: %s\n", buffer);
+
+    // Processing the Response from Server:
+    if (n == ack_packet_size)
+    {
+        memset(&ack_packet, 0, ack_packet_size);
+        memcpy(&ack_packet, rec_buff, ack_packet_size);
+#ifdef DEBUGGING
+        // printf("Received ACK packet.\n");
+        printf("Received ACK packet: %s", ack_packet_to_string((ack_packet_t *)&ack_packet));
+#endif
+    }
+    else if (n == reject_packet_size)
+    {
+        memset(&reject_packet, 0, reject_packet_size);
+        memcpy(&reject_packet, rec_buff, reject_packet_size);
+#ifdef DEBUGGING
+        printf("Raw reject packet: 0x%40X\n", rec_buff);
+        if (is_valid_reject_packet(&reject_packet))
+            printf("REJ packet formatted properly!\n");
+        else
+            printf("ERROR: REJ packet formatted improperly!\n");
+        // printf("Received REJECT packet.\n");
+        printf("Received REJECT packet: %s", reject_packet_to_string((reject_packet_t *)&reject_packet));
+#endif
+        // If rejected, move on to next packet to send
+    }
+    else
+    {
+        char *errString = "";
+        sprintf(errString, "Error: Invalid packet size/type received: %d\n", n);
+        error(errString);
+    }
+    // buffer[n] = '\0';
+    // printf("Got response from server: %s\n", buffer);
 
     // Close the socket (Housekeeping)
     close(sock);
