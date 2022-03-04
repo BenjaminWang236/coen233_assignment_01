@@ -1,19 +1,11 @@
-Test: Rej Dup Packet:	0xFFF7
-Test: hostname: localhost
-Test: data_packet_t size: 264
-Test: ack_packet_t size: 8
-Test: reject_packet_t size: 10
-Timeout: 3 seconds
-Timeout reached
-RECEIVED LENGTH: 12
-Error: Invalid segment number 5
-Test: data_packet is invalid
-data_packet_to_string: 
-start=	0xFFFF
-client_id=	255
-packet_type=	0xFFF1
-segment_no=	5
-length=	12
-payload=	Hello World!
+Please enter the message: DATA LENGTH: 16
+Raw reject packet: 0x                                A1273FB0
+Error: Invalid start packet 0x000A
+ERROR: REJ packet formatted improperly!
+Received REJECT packet: 
+start=	0x000A
+client_id=	0
+packet_type=	0x0000
+sub_code=	0000
+received_segment_no=	0
 end=	0xFFFF
-payload length: strlen: 12	sizeof: 255
