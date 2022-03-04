@@ -151,7 +151,7 @@ void update_data_packet(data_packet_t *packet, uint8_t client_id, uint8_t segmen
     packet->segment_no = segment_no;
     packet->length = length;
 #ifdef DEBUGGING
-    printf("RECEIVED LENGTH: %d\n", length);
+    printf("DATA LENGTH: %d\n", length);
 #endif
     memcpy(packet->payload, payload, length);
 }

@@ -118,6 +118,9 @@ int main(int argc, char *argv[])
 
         if (packet_status == PACKET_OK)
         {
+#ifdef DEBUGGING
+            printf("Packet OK!\n");
+#endif
             // Tracking the packet sequence: Since packet's valid
             if (!packet_seq_started)
                 packet_seq_started = true;
@@ -142,6 +145,9 @@ int main(int argc, char *argv[])
         }
         else
         {
+#ifdef DEBUGGING
+            printf("Packet Rejected with REJ sub code 0x%04X\n", packet_status);
+#endif
             // REJ packet response:
             reset_reject_packet(&reject_packet);
             update_reject_packet(&reject_packet, data_packet.client_id, packet_status, data_packet.segment_no);
@@ -151,7 +157,7 @@ int main(int argc, char *argv[])
         }
         if (n < 0)
             error("ERROR: sendto");
-        return EXIT_SUCCESS;
     }
+    return EXIT_SUCCESS;
 }
                 
