@@ -27,6 +27,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdbool.h>
+#include <errno.h>
 
 // Port and Hostname:
 #define PORT 8080
