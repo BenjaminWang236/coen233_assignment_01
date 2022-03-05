@@ -16,8 +16,25 @@
 
 uint16_t validate_client_data_packet(bool *packet_seq_started, uint8_t *packet_seq_num, data_packet_t *curr_data, data_packet_t *prev_data)
 {
+    // if (*packet_seq_started && data_packet_equals(curr_data, prev_data))
+    if (*packet_seq_started && curr_data->segment_no == prev_data->segment_no)
+    {
+        printf("ERROR: Duplicate packet received!\n");
+        return REJECT_DUPLICATE_PACKET;
+    }
     if (*packet_seq_started && curr_data->segment_no != (*packet_seq_num + 1))
     {
+#ifdef DEBUGGING
+        printf("Error: Expected sequence number %d\n", *packet_seq_num + 1);
+#endif
+        printf("ERROR: Out of order packet!\n");
+        return REJECT_OUT_OF_SEQUENCE;
+    }
+    else if (!(*packet_seq_started) && curr_data->segment_no != 0)
+    {
+#ifdef DEBUGGING
+        printf("Error: Expected sequence number %d\n", 0);
+#endif
         printf("ERROR: Out of order packet!\n");
         return REJECT_OUT_OF_SEQUENCE;
     }
@@ -30,11 +47,6 @@ uint16_t validate_client_data_packet(bool *packet_seq_started, uint8_t *packet_s
     {
         printf("ERROR: End of Packet Missing!\n");
         return REJECT_END_OF_PACKET_MISSING;
-    }
-    if (*packet_seq_started && data_packet_equals(curr_data, prev_data))
-    {
-        printf("ERROR: Duplicate packet received!\n");
-        return REJECT_DUPLICATE_PACKET;
     }
 
     return PACKET_OK;
@@ -107,8 +119,7 @@ int main(int argc, char *argv[])
         n = recvfrom(sock, &data_packet, data_packet_size, 0, (struct sockaddr *)&client, &clientlen);
         if (n < 0)
             error("ERROR: recvfrom");
-            // buf[n] = '\0';
-            // printf("Received a datagram: %s\n", buf);
+        printf("\nReceived packet!\n");
 #ifdef DEBUGGING
         char *data_str = data_packet_to_string(&data_packet);
         printf("Received data packet: %s", data_str);
@@ -126,11 +137,6 @@ int main(int argc, char *argv[])
             // Tracking the packet sequence: Since packet's valid
             if (!packet_seq_started)
                 packet_seq_started = true;
-            else if (packet_seq_started && packet_seq_num >= (PACKET_GROUP_SIZE - 1))
-            {
-                packet_seq_num = 0;
-                packet_seq_started = false;
-            }
             else
                 packet_seq_num = data_packet.segment_no;
 
@@ -141,6 +147,12 @@ int main(int argc, char *argv[])
             // ACK packet response:
             reset_ack_packet(&ack_packet);
             update_ack_packet(&ack_packet, data_packet.client_id, packet_seq_num);
+            if (!is_valid_ack_packet(&ack_packet))
+                error("ERROR: Invalid ACK packet");
+#ifdef DEBUGGING
+            else
+                printf("ACK packet formatted properly!\n");
+#endif
             // Sending ACK response back to Client
             n = sendto(sock, &ack_packet, ack_packet_size,
                        0, (const struct sockaddr *)&client, clientlen);
@@ -152,12 +164,12 @@ int main(int argc, char *argv[])
 #endif
             // REJ packet response:
             reset_reject_packet(&reject_packet);
-            update_reject_packet(&reject_packet, data_packet.client_id, packet_status, data_packet.segment_no);
+            update_reject_packet(&reject_packet, data_packet.client_id, packet_status, packet_seq_num);
+            if (!is_valid_reject_packet(&reject_packet))
+                error("ERROR: REJ packet formatted improperly!\n");
 #ifdef DEBUGGING
-            if (is_valid_reject_packet(&reject_packet))
-                printf("REJ packet formatted properly!\n");
             else
-                printf("ERROR: REJ packet formatted improperly!\n");
+                printf("REJ packet formatted properly!\n");
             char *rej_str = reject_packet_to_string(&reject_packet);
             printf("Sending response REJ packet: %s\n", rej_str);
             free(rej_str);
@@ -168,6 +180,19 @@ int main(int argc, char *argv[])
         }
         if (n < 0)
             error("ERROR: sendto");
+
+        // Resetting the packet status after max of 5 packets
+        if (packet_seq_started && packet_seq_num >= (PACKET_GROUP_SIZE - 1))
+        {
+#ifdef DEBUGGING
+            printf("SERVER RESETTING SEQ NUM AND SEQ STARTED\n");
+#endif
+            packet_seq_num = 0;
+            packet_seq_started = false;
+        }
+#ifdef DEBUGGING
+        printf("\n\n");
+#endif
     }
 
     close(sock);

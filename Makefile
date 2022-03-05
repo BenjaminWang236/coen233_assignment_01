@@ -9,7 +9,7 @@ CFLAGS  = -g -Wall -fshort-enums
 
 # the build target executable:
 HEADER = customProtocol
-TARGET = myclient myserver generateTestInputs
+TARGET = myclient myserver testing
 
 
 all: $(TARGET)
@@ -25,8 +25,8 @@ client: myclient.c
 server: myserver.c
 	$(CC) $(CFLAGS) -o myserver myserver.c $(HEADER).c
 
-generator: generateTestInputs.c
-	$(CC) $(CFLAGS) -o generateTestInputs generateTestInputs.C $(HEADER).c
+test: testing.c
+	$(CC) $(CFLAGS) -o testing testing.c $(HEADER).c
 
 clean:
 	$(RM) $(TARGET)

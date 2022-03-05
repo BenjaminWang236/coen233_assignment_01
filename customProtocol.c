@@ -152,6 +152,7 @@ void update_data_packet(data_packet_t *packet, uint8_t client_id, uint8_t segmen
 #ifdef DEBUGGING
     printf("DATA LENGTH: %d\n", length);
 #endif
+    memset(packet->payload, DEFAULT_VALUE, PACKET_DATA_PAYLOAD_SIZE);
     memcpy(packet->payload, payload, length);
 }
 void update_ack_packet(ack_packet_t *packet, uint8_t client_id, uint8_t received_segment_no)

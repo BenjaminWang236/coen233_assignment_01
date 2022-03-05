@@ -28,10 +28,11 @@ int main(int argc, char *argv[])
     struct sockaddr_in server, recv_from;
     unsigned int length = sizeof(struct sockaddr_in);
     struct hostent *hp;
-    char buffer[sizeof(data_packet_t)];
+    char buffer[PACKET_DATA_PAYLOAD_SIZE];
     uint8_t peek_buff[1];
     bool response_received = false;
     struct timeval tv;
+    uint8_t client_id, seg_no = 0, buffLen, input_seg_no;
 
     // Default port number and hostname
     char *host = HOSTNAME;
@@ -44,7 +45,22 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
+    // File IO variables
+    char *filename = argv[1];
+    FILE *fp;
+    char *line = NULL;
+    size_t len = 0;
+
     // Reading input file:
+    fp = fopen(filename, "r");
+    if (fp == NULL)
+    {
+        error("Error opening file");
+    }
+    // Read the number of segments to send:
+    getline(&line, &len, fp);
+    seg_count = atoi(line);
+    memset(line, 0, len);
 
     // Create socket:
     if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
@@ -62,14 +78,7 @@ int main(int argc, char *argv[])
           hp->h_length);
     server.sin_port = htons(port);
 
-    // Getting the message from the user
-    // TODO: Replace with getline() from input files
-    printf("Please enter the message: ");
-    bzero(buffer, LINE_LENGTH);
-    fgets(buffer, LINE_LENGTH - 1, stdin);
-    seg_count = 1;
-
-    uint8_t client_id = 123, seg_no = 0, buffLen = strlen(buffer);
+    // Custom Protocol Packets:
     data_packet_t data_packet = {};
     size_t data_packet_size = sizeof(data_packet);
     ack_packet_t ack_packet = {};
@@ -80,18 +89,83 @@ int main(int argc, char *argv[])
     // Loop through all the segments:
     for (seg_no = 0; seg_no < seg_count; seg_no++)
     {
+        // Read Client ID:
+        getline(&line, &len, fp);
+        client_id = atoi(line);
+        memset(line, 0, len);
+        // Read Input Segment Number:
+        getline(&line, &len, fp);
+        input_seg_no = atoi(line) % PACKET_GROUP_SIZE;
+        memset(line, 0, len);
+        // Read Payload:
+        getline(&line, &len, fp);
+        memset(buffer, 0, PACKET_DATA_PAYLOAD_SIZE);
+        strcpy(buffer, line);
+        buffer[strcspn(buffer, "\n")] = 0;
+        buffLen = strlen(buffer);
+        memset(line, 0, len);
+
+        // Error handling special cases:
+        if (client_id == ERROR_SPECIAL_CLIENT)
+        {
+            if (strcmp(buffer, ERR_OOS_MSG) == 0)
+            {
+                printf("Error handling: Case 1: Out of Sequence segment number\n");
+            }
+            else if (strcmp(buffer, ERR_LEN_MSG) == 0)
+            {
+                printf("Error handling: Case 2: Length Mismatch\n");
+            }
+            else if (strcmp(buffer, ERR_END_MSG) == 0)
+            {
+                printf("Error handling: Case 3: End of Packet Missing\n");
+            }
+            else if (strcmp(buffer, ERR_DUP_MSG) == 0)
+            {
+                printf("Error handling: Case 4: Duplicate Packet check done by comparing sequence number as specified in instruction\n");
+            }
+        }
+
         response_received = false;
         // Retry up to 3 times, first time (0th) is the original packet
         for (ack_timer_reset_count = 0; ack_timer_reset_count <= ACK_TIMER_RETRY_COUNT && !response_received; ack_timer_reset_count++)
         {
+#ifdef DEBUGGING
+            printf("\n");
+#endif
             if (ack_timer_reset_count == 0)
             {
+                printf("Sending packet: %d\n", input_seg_no);
                 reset_data_packet(&data_packet);
-                update_data_packet(&data_packet, client_id, seg_no, buffLen, buffer);
+                update_data_packet(&data_packet, client_id, input_seg_no, buffLen, buffer);
+                if (!is_valid_data_packet(&data_packet))
+                    error("Error: Invalid data packet\n");
+#ifdef DEBUGGING
+                else
+                    printf("Data packet formatted okay\n");
+                char *data_str = data_packet_to_string(&data_packet);
+                printf("Sending DATA packet: %s", data_str);
+                free(data_str);
+#endif
             }
             else
             {
-                printf("Retrying attempt %d\n", ack_timer_reset_count);
+                printf("Error:\tACK_TIMER timed out!\nRetrying attempt %d\n", ack_timer_reset_count);
+            }
+
+            // Error handling cases: Modifications to correct Data packet:
+            if (client_id == ERROR_SPECIAL_CLIENT)
+            {
+                if (strcmp(buffer, ERR_LEN_MSG) == 0)
+                {
+                    // printf("Error handling: Case 2: Length Mismatch\n");
+                    data_packet.length = (data_packet.length + 1) % PACKET_DATA_PAYLOAD_SIZE;
+                }
+                if (strcmp(buffer, ERR_END_MSG) == 0)
+                {
+                    // printf("Error handling: Case 3: End of Packet Missing\n");
+                    data_packet.end_packet = 0xFFF0;
+                }
             }
 
             // Send message to server
@@ -127,10 +201,14 @@ int main(int argc, char *argv[])
                 if (n < 0)
                     error("Error: recvfrom");
                 response_received = true;
-#ifdef DEBUGGING
-                // printf("Received ACK packet.\n");
+
+                if (ack_packet.received_segment_no == input_seg_no)
+                    printf("Received matching ACK segment number %d\n", input_seg_no);
+                else
+                    printf("Received MISMATCHING ACK segment number %d\n", ack_packet.received_segment_no);
                 if (is_valid_ack_packet(&ack_packet))
                     printf("Received valid ACK packet.\n");
+#ifdef DEBUGGING
                 else
                     printf("Received invalid ACK packet.\n");
                 char *ack_str = ack_packet_to_string(&ack_packet);
@@ -146,10 +224,11 @@ int main(int argc, char *argv[])
                 if (n < 0)
                     error("Error: recvfrom");
                 response_received = true;
-#ifdef DEBUGGING
+
                 // printf("Raw reject packet: 0x%40X\n", reject_packet);
                 if (is_valid_reject_packet(&reject_packet))
-                    printf("REJ packet formatted properly!\n");
+                    printf("Received valid REJ packet\n");
+#ifdef DEBUGGING
                 else
                     printf("ERROR: REJ packet formatted improperly!\n");
                 char *rej_str = reject_packet_to_string(&reject_packet);
@@ -157,6 +236,7 @@ int main(int argc, char *argv[])
                 free(rej_str);
 
 #endif
+                printf("Reject sub code: 0x%04X\n", reject_packet.sub_code);
                 break;
                 // If rejected, move on to next packet to send
             }
@@ -168,9 +248,13 @@ int main(int argc, char *argv[])
                 error(errString);
             }
         }
+        printf("\n");
     }
 
-    // Close the socket (Housekeeping)
+    // Housekeeping:
+    fclose(fp);
+    if (line)
+        free(line);
     close(sock);
     return EXIT_SUCCESS;
 }

@@ -13,7 +13,7 @@
 #define CUSTOMPROTOCOL_H
 
 // Debug flag
-#define DEBUGGING 0
+// #define DEBUGGING 0
 
 // library includes
 #include <sys/types.h>
@@ -41,6 +41,13 @@
 #define LINE_LENGTH 256
 #define DEFAULT_VALUE 0
 #define PACKET_OK 0
+
+// Error Handling Testing:
+#define ERROR_SPECIAL_CLIENT 123
+#define ERR_OOS_MSG "Case 1: Out of Sequence segment number"
+#define ERR_LEN_MSG "Case 2: Length Mismatch"
+#define ERR_END_MSG "Case 3: End of Packet Missing"
+#define ERR_DUP_MSG "Case 4: Duplicate Packet check done by comparing sequence number as specified in instruction"
 
 // Custom Protocol Primitives
 #define START_PACKET 0xFFFF
