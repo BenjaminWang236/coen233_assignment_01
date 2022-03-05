@@ -3,3 +3,5 @@
 
 Client using customized protocol on top of UDP protocol for sending
 information to the server.
+
+Author: Benjamin Wang (1179478)
