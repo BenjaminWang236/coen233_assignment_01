@@ -24,9 +24,8 @@ void error(const char *msg)
 
 void timeout(void)
 {
-    int timeout_sec = 3;
-    int timeout_milli = timeout_sec * 1000;
-    printf("Timeout: %d seconds\n", timeout_sec);
+    int timeout_milli = ACK_TIMER_WAIT_TIME_MS;
+    printf("Timeout: %d seconds\n", timeout_milli / 1000);
     int elapsed_time = clock() * 1000 / CLOCKS_PER_SEC;
     int end_time = elapsed_time + timeout_milli;
     while (elapsed_time <= end_time)
