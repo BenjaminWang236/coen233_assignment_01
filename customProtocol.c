@@ -22,19 +22,6 @@ void error(const char *msg)
     exit(EXIT_FAILURE);
 }
 
-void timeout(void)
-{
-    int timeout_milli = ACK_TIMER_WAIT_TIME_MS;
-    printf("Timeout: %d seconds\n", timeout_milli / 1000);
-    int elapsed_time = clock() * 1000 / CLOCKS_PER_SEC;
-    int end_time = elapsed_time + timeout_milli;
-    while (elapsed_time <= end_time)
-    {
-        elapsed_time = clock() * 1000 / CLOCKS_PER_SEC;
-    }
-    printf("Timeout reached\n");
-}
-
 bool is_valid_data_packet(data_packet_t *packet)
 {
     if (packet->start_packet != START_PACKET)

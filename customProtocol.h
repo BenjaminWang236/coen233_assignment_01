@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <time.h>
 #include <stdbool.h>
 #include <errno.h>
 
@@ -110,11 +109,6 @@ typedef struct
  * @param msg Error message
  */
 void error(const char *msg);
-
-/**
- * @brief Timeout function, testing purposes only
- */
-void timeout(void);
 
 // Validating that packet is correct
 bool is_valid_data_packet(data_packet_t *packet);

@@ -40,7 +40,8 @@ int main(int argc, char *argv[])
     {
         error("Error opening file");
     }
-    while ((read = getline(&line, &len, fp)) != -1) {
+    while ((read = getline(&line, &len, fp)) != -1)
+    {
         printf("Retrieved line of length %zu:\n", read);
         printf("%s", line);
     }
@@ -53,7 +54,6 @@ int main(int argc, char *argv[])
     printf("Test: data_packet_t size: %i\n", (int)sizeof(data_packet_t));
     printf("Test: ack_packet_t size: %i\n", (int)sizeof(ack_packet_t));
     printf("Test: reject_packet_t size: %i\n", (int)sizeof(reject_packet_t));
-    // timeout();
     char *hello = "Hello World!";
     data_packet_t data_packet = {};
     reset_data_packet(&data_packet);
@@ -65,7 +65,6 @@ int main(int argc, char *argv[])
     // printf("payload: %s\n", data_packet.payload);
     printf("data_packet_to_string: %s", data_packet_to_string(&data_packet));
     printf("payload length: strlen: %lu\tsizeof: %lu\n", strlen(data_packet.payload), sizeof(data_packet.payload));
-
 
     return EXIT_SUCCESS;
 }

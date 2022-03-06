@@ -14,6 +14,15 @@
 
 #include "customProtocol.h"
 
+/**
+ * @brief Verify the received client data-packet is within specification
+ *
+ * @param packet_seq_started    flag for denoting whether the packet sequence has started
+ * @param packet_seq_num    sequence number tracker of the packet
+ * @param curr_data    current data packet
+ * @param prev_data    previous data packet. Used for duplicate packet check, if at sequence number 0 this is not checked
+ * @return REJECT_SUB_CODE    0 if packet is valid, otherwise Reject sub-code
+ */
 uint16_t validate_client_data_packet(bool *packet_seq_started, uint8_t *packet_seq_num, data_packet_t *curr_data, data_packet_t *prev_data)
 {
     // if (*packet_seq_started && data_packet_equals(curr_data, prev_data))
@@ -65,8 +74,6 @@ int main(int argc, char *argv[])
     int sock, length, n, port;
     socklen_t clientlen;
     struct sockaddr_in server, client;
-    // char buf[MAXLINE];
-    // char *hello = "Hello from server";
 
     // Checking if port number is provided
     if (argc == 1)
@@ -115,6 +122,7 @@ int main(int argc, char *argv[])
     // Server runs forever, I guess
     while (1)
     {
+        // Block until a packet is received
         memset(&data_packet, 0, data_packet_size);
         n = recvfrom(sock, &data_packet, data_packet_size, 0, (struct sockaddr *)&client, &clientlen);
         if (n < 0)
@@ -153,6 +161,7 @@ int main(int argc, char *argv[])
             else
                 printf("ACK packet formatted properly!\n");
 #endif
+
             // Sending ACK response back to Client
             n = sendto(sock, &ack_packet, ack_packet_size,
                        0, (const struct sockaddr *)&client, clientlen);
@@ -174,6 +183,7 @@ int main(int argc, char *argv[])
             printf("Sending response REJ packet: %s\n", rej_str);
             free(rej_str);
 #endif
+
             // Sending ACK response back to Client
             n = sendto(sock, &reject_packet, reject_packet_size,
                        0, (const struct sockaddr *)&client, clientlen);
@@ -195,6 +205,7 @@ int main(int argc, char *argv[])
 #endif
     }
 
+    // Close the socket (Housekeeping)
     close(sock);
     return EXIT_SUCCESS;
 }
