@@ -13,7 +13,7 @@
 #define CUSTOMPROTOCOL_H
 
 // Debug flag
-// #define DEBUGGING 0
+#define DEBUGGING 0
 
 // library includes
 #include <sys/types.h>
